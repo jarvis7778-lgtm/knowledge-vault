@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+.venv/
+venv/
+.DS_Store
+
+# generated outputs (users should store these in their vault, not in repo)
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.pdf
