@@ -19,7 +19,11 @@ Inside your vault, this skill writes into:
 - `python3`
 - `bird` (for X thread fetching)
 - `google-chrome-stable` (for screenshots)
-- Python package: `Pillow` (for cropping + screenshot quality checks)
+- Python deps: `pip install -r requirements.txt`
+
+### Optional environment variables
+
+- `CHROME_PATH` (default: `/usr/bin/google-chrome-stable`) — set if Chrome lives elsewhere.
 
 ## X ingestion
 
