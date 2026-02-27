@@ -82,7 +82,7 @@ def main() -> None:
 
     md: list[str] = []
     md.append("---")
-    md.append(f"source: file://{src_pdf}")
+    md.append(f"source: file://{src_pdf.name}")
     md.append(f"saved_at: {now.strftime('%Y-%m-%d %H:%M:%S')}")
     md.append("type: pdf")
     md.append(f"direction: {args.direction}")

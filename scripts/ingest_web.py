@@ -60,7 +60,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("url")
     ap.add_argument("--vault", required=True)
-    ap.add_argument("--direction", default="Inbox")
+    ap.add_argument("--direction", default="auto")
     ap.add_argument("--title", default=None)
     ap.add_argument("--tags", default="")
     ap.add_argument("--tldr", default="")
@@ -97,8 +97,44 @@ def main() -> None:
     if args.keypoints_file:
         kps = Path(args.keypoints_file).read_text(encoding="utf-8", errors="ignore").strip()
 
+    def resolve_direction(direction: str, url: str, title: str, tags_csv: str) -> str:
+        """Resolve direction.
+
+        If direction == 'auto', pick a concrete folder based on simple heuristics.
+        This is intentionally conservative (only a few stable buckets).
+        """
+        if direction != "auto":
+            return direction
+
+        hay = " ".join([url or "", title or "", tags_csv or ""]).lower()
+        # Heuristics: code/engineering/devops/cloudflare/nextjs/etc -> code
+        code_keywords = [
+            "cloudflare",
+            "worker",
+            "workers",
+            "next.js",
+            "nextjs",
+            "supabase",
+            "postgres",
+            "hyperdrive",
+            "vercel",
+            "devops",
+            "kubernetes",
+            "docker",
+            "api",
+            "typescript",
+            "javascript",
+        ]
+        if any(k in hay for k in code_keywords):
+            return "code"
+
+        # default fallback
+        return "Inbox"
+
+    resolved_direction = resolve_direction(args.direction, args.url, (args.title or ""), args.tags)
+
     # direction path supports nested segments
-    direction_path = Path(*[p for p in args.direction.split("/") if p])
+    direction_path = Path(*[p for p in resolved_direction.split("/") if p])
     notes_dir = base / "Notes" / direction_path / "Web"
     notes_dir.mkdir(parents=True, exist_ok=True)
 
@@ -115,7 +151,7 @@ def main() -> None:
     md.append(f"source: {args.url}")
     md.append(f"saved_at: {now.strftime('%Y-%m-%d %H:%M:%S')}")
     md.append("type: web")
-    md.append(f"direction: {args.direction}")
+    md.append(f"direction: {resolved_direction}")
     if tags:
         md.append(f"tags: [{', '.join(tags)}]")
     md.append(f"raw_html: {raw_html.relative_to(vault)}")

@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -166,9 +167,11 @@ def _screenshot_url(url: str, out_path: Path) -> None:
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
+    chrome_bin = os.environ.get("CHROME_PATH", "google-chrome-stable")
+
     def run_once(virtual_budget_ms: int) -> None:
         cmd = [
-            "/usr/bin/google-chrome-stable",
+            chrome_bin,
             "--headless=new",
             "--disable-gpu",
             "--no-sandbox",
